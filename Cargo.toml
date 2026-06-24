@@ -7,6 +7,7 @@ edition = "2024"
 assert-json-diff = "2.0.2"
 colored = "3.1.1"
 hexify = "0.0.3"
+serde_json = "1.0.150"
 thiserror = "2.0.18"
 walkdir = "2.5.0"
 

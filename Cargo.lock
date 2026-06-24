@@ -28,6 +28,7 @@ dependencies = [
  "assert-json-diff",
  "colored",
  "hexify",
+ "serde_json",
  "thiserror",
  "walkdir",
 ]

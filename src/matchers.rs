@@ -1,7 +1,7 @@
 pub(super) fn json(lhs: &[u8], rhs: &[u8]) -> Result<(), String> {
     assert_json_diff::assert_json_matches_no_panic(
-        &lhs,
-        &rhs,
+        &serde_json::from_slice::<'_, serde_json::Value>(lhs).map_err(|err| err.to_string())?,
+        &serde_json::from_slice::<'_, serde_json::Value>(rhs).map_err(|err| err.to_string())?,
         assert_json_diff::Config::new(assert_json_diff::CompareMode::Strict),
     )
 }
