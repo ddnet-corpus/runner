@@ -1,3 +1,3 @@
 mod corpus;
-mod matchers;
 mod ffi;
+mod matchers;

@@ -69,18 +69,18 @@ pub(super) enum RunCorpusError<'a> {
     Io(#[from] io::Error),
 }
 
-pub(super) struct Corpus<'a> {
-    root: &'a Path,
+pub(super) struct Corpus {
+    root: PathBuf,
     tests: Vec<Test>,
     matchers: HashMap<String, Matcher>,
     runners: BTreeMap<PathBuf, Runner>,
 }
 
-impl<'a> Corpus<'a> {
-    pub(super) fn new(root: &'a Path) -> Result<Self, NewCorpusError> {
+impl Corpus {
+    pub(super) fn new(root: PathBuf) -> Result<Self, NewCorpusError> {
         let mut tests: BTreeMap<PathBuf, (Option<String>, Option<String>)> = BTreeMap::new();
 
-        for entry in WalkDir::new(root)
+        for entry in WalkDir::new(&root)
             .into_iter()
             .filter_entry(|e| !is_hidden(e))
         {
@@ -104,7 +104,7 @@ impl<'a> Corpus<'a> {
             };
             let path = entry
                 .path()
-                .strip_prefix(root)
+                .strip_prefix(&root)
                 .unwrap()
                 .to_path_buf()
                 .with_file_name(name);
@@ -196,8 +196,13 @@ impl<'a> Corpus<'a> {
             let Some(matcher) = self.matchers.get(expected_ext) else {
                 return Err(RunCorpusError::MatcherNotFound(expected_ext));
             };
-            let input = fs::read(file_path(self.root, path, FileRole::Input, input_ext))?;
-            let expected = fs::read(file_path(self.root, path, FileRole::Expected, expected_ext))?;
+            let input = fs::read(file_path(&self.root, path, FileRole::Input, input_ext))?;
+            let expected = fs::read(file_path(
+                &self.root,
+                path,
+                FileRole::Expected,
+                expected_ext,
+            ))?;
             let actual = runner(&input, input_ext);
 
             print!("{} - ", path.display());

@@ -2,7 +2,7 @@ use crate::{corpus, matchers};
 use core::slice;
 use std::{
     ffi::{CStr, CString, c_char},
-    path::{Path, PathBuf},
+    path::PathBuf,
     ptr,
     str::FromStr,
 };
@@ -27,14 +27,13 @@ pub extern "C" fn ddcorp_buffer_write_str(buf: *mut DDCorpBuffer, str: *const c_
     };
 }
 
-// is using 'static in this case cursed?
-pub struct DDCorpCorpus(corpus::Corpus<'static>);
+pub struct DDCorpCorpus(corpus::Corpus);
 
 #[unsafe(no_mangle)]
 pub extern "C" fn ddcorp_corpus_create(path: *const c_char) -> *mut DDCorpCorpus {
     let path = unsafe { CStr::from_ptr(path) }.to_str().unwrap();
 
-    match corpus::Corpus::new(Path::new(path)) {
+    match corpus::Corpus::new(PathBuf::from(path)) {
         Ok(mut corpus) => {
             corpus.add_matcher("json".to_string(), matchers::json);
             corpus.add_matcher("bin".to_string(), matchers::binary);
